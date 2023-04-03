@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var tyhja = "44";
+
+        $(document).ready(function () {
+            $("div").click(function (event) {
+                //Mennään tarkistuksiin jonne menee painettu div, sekä tyhjän laatikon arvo
+                if (check(this, tyhja)) {
+                    $("#" + tyhja).text($("#" + this.id).text());
+                    $("#" + this.id).text("");
+                    tyhja = this.id;
+                }
+                else {
+                    //Ilmoitetaan jos klikattu väärää ruutua
+                    console.log("Tyhjän ID edelleen: " + tyhja);
+                    $(".wrongPress").fadeIn(500).fadeOut(500);
+                   
+                }
+                
+                colorDivs();
+            });
+
+
+            function check(x, tyhja) {
+                //Vertailu tehdään ID numeron mukaan
+                //Tyhjä id muutetaan ensiksi int tyyppiseksi vertailuja varten
+                tyhja = parseInt(tyhja);
+                //Tarkistetaan onko painettu nappi tyhjän yläpuolella
+                if (x.id == tyhja - 10)
+                    return true;
+                //tarkistetaan painettu alapuolelta
+                else if (x.id == tyhja + 10)
+                    return true;
+                //tarksitetaan onko painettu vasemmalta
+                else if (x.id == tyhja - 1)
+                    return true;
+                //tarksitetaan onko painettu oikealta
+                else if (x.id == tyhja + 1)
+                    return true;
+                else
+                    //Palautetaan false jos painettu ei ollut tyhjän vieressä
+                    return false;
+            }
+            $("#random").click(function (event) {
+                //Alustetaan tyhjä ruutu uudesetaan
+                tyhja = 44;
+                $("#44").text("");
+                do {//Tehdään tyhjä lista johon arvotaan numerot
+                    var randomArray = [];
+                    //Alustetaan ensimmäinen div ID johon työtetään random luku
+                    var divID = "#11";
+                    //Käydään 15 kertaa for loop läpi jotta saadaan oikea määrä numeroita
+                    for (var i = 0; i < 15; i++) {
+                        //Tehdään käynti Random generaattorilla
+                        do {
+                            var x = getRandom()
+                        }
+                        //Aina uudestaan jos numero löytyy jo taulukosta
+
+                        while (randomArray.includes(x))
+                        //Vasta sitten mennään laittamaan numerot taulukkoon
+                        randomArray.push(x);
+                    }
+                    //Logitetaan koko random array
+                    console.log(randomArray);
+                    //Käydään randomilla luotu taulukko läpi
+                    for (i in randomArray) {
+                        //Asetetaan random taulukosta arvo diviin 
+                        $(divID).text(randomArray[i]);
+                        //Vaihdetaan tarkasteltava div ID next("div")
+                        divID = $(divID).next("div");
+
+                    }
+                }
+                while (!getInv(randomArray))
+                //Väritetään ruudut uudestaan, ja tarkastellaan samalla voitto
+                colorDivs();
+            });
+            function getRandom() {
+                //Käytetään Math.floor(Math.random) funktiota ja rajataan hakualue
+                var x = Math.floor(Math.random() * 15) + 1
+                return x;
+            }
+            function getInv(array) {
+                var invCount = 0;
+
+
+                for (var i = 0; i < array.length; i++) {
+                    for (var j = i + 1; j < array.length; j++) {
+                        console.log("I:n arvo on : " + array[i])
+                        console.log("J:n arvo on : " + array[j])
+                        if (array[i] > array[j]) {
+                            console.log("Lisättiin JIPPII JAHUU")
+                            invCount++;
+                        }
+                    }
+                }
+
+
+                console.log(invCount);
+                if (invCount % 2 == 0) {
+                    console.log("Tämä pöytä kelpaa")
+                    return true;
+                }
+                else {
+                    console.log("Ei kelpaa, teeppä uudestaan")
+                    return false
+                }
+            }
+
+
+            $("#colors").click(function (event) {
+                colorDivs();
+            });
+            function colorDivs() {
+                //Alustetaan vaihdettavan divin id, 
+                //sekä tehdään tyhjä taulukko valmiiksi pelin voiton tarkastelua varten
+                var divID = "#11";
+                var winCondition = [];
+                for (var i = 0; i < 16; i++) {
+                    var divInt = parseInt($(divID).text())
+                    //Syötetään voiton tarkastelua varten taulukkoon sisältö valmiiksi
+                    winCondition.push(divInt);
+                    //Jos luvut 1-4 tai 9-12 asetetaan css oikeaksi JQueryllä
+                    if (divInt >= 1 && divInt <= 4 || divInt >= 9 && divInt <= 12) {
+                        $(divID).css({ background: "red" })
+                        $(divID).css({ color: "white" })
+                    }
+                    //Jos luvut 5-8 tai 13-15 asetetaan css oikeaksi
+                    else if (divInt >= 5 && divInt <= 8 || divInt >= 13 && divInt <= 15) {
+                        $(divID).css({ background: "white" })
+                        $(divID).css({ color: "black" })
+                    }
+                    //Jos ei lukua niin asetetaan tyhjän ruudun css oikeaksi
+                    else {
+                        $(divID).css({ background: "black" })
+                        $(divID).css({ color: "white" })
+                    }
+                    //Vaihdetaan tarkasteltava divID
+                    divID = $(divID).next("div");
+                }
+                //Tarkastellaan voittoa käymällä aiemmin tehty taulukko läpi every funktiolla
+                if ((winCondition.every((element, index) => {
+                    //Jos luku vastaa index+1 avoa, eli onko luvut oikeassa järjestyksessä
+                    //Tyhjän luvun tarkastelu katsotaan Number.isNan() funktiolla
+                    if (element == index + 1 || Number.isNaN(element)) {
+                        return true;
+                    }
+                    else {
+                        return false
+                    }
+                }))) {
+                    alert("voitit pelin:")
+                };
+            }
+
+        });
+    </script>
+    <title>15-peli</title>
+    <style>
+        div {
+            background: black;
+            height: 100px;
+            width: 100px;
+            position: absolute;
+            color: white;
+            text-align: center;
+            font-size: xx-large;
+            border: yellow solid 1px;
+        }
+
+        button {
+            margin-top: 450px;
+            width: 175px;
+            height: 40px;
+        }
+
+        
+
+        footer {
+            width: 400px;
+            flex: wrap;
+            flex-direction: row;
+            -ms-flex-align: center;
+        }
+
+        body {
+            flex-wrap: nowrap;
+            flex: auto;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: hotpink;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="game">
+        <div id="11" style="top:0px;left:0px">1</div>
+        <div id="12" style="top:0px;left:100px">2</div>
+        <div id="13" style="top:0px;left:200px">3</div>
+        <div id="14" style="top:0px;left:300px">4</div>
+        <div id="21" style="top:100px;left:0px">5</div>
+        <div id="22" style="top:100px;left:100px">6</div>
+        <div id="23" style="top:100px;left:200px">7</div>
+        <div id="24" style="top:100px;left:300px">8</div>
+        <div id="31" style="top:200px;left:0px">9</div>
+        <div id="32" style="top:200px;left:100px">10</div>
+        <div id="33" style="top:200px;left:200px">11</div>
+        <div id="34" style="top:200px;left:300px">12</div>
+        <div id="41" style="top:300px;left:0px">13</div>
+        <div id="42" style="top:300px;left:100px">14</div>
+        <div id="43" style="top:300px;left:200px">15</div>
+        <div id="44" style="top:300px;left:300px"></div>
+    </section>
+    <!-- Buttonit joista voidaan arpoa radom numerot, sekä vaihtaa värit ruutuihin-->
+    <nav>
+        <button id="random">Random</button>
+        <button id="colors">Colors</button>
+    </nav>
+    
+       <h1 class="wrongPress">Väärä painallus</h1>
+    
+
+
+</body>
+
+</html>
